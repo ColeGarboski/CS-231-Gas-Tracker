@@ -1,12 +1,14 @@
 <template>
-  <div>
-    <h2 class="text-6xl">Gas Prices</h2>
-    <ul>
-      <li v-for="(gasPrice, index) in gasPrices" :key="index">
-        <span>{{ gasPrice.StationName }}: </span>
-        <span>{{ gasPrice.FuelTypeName }}: </span>
-        <span>{{ getEmoji(gasPrice.FuelTypeName) }} </span>
-        <span>${{ gasPrice.Price.toFixed(2) }} </span>
+  <div class="bg-gray-100 min-h-screen">
+    <h2 class="text-4xl font-bold text-center py-8">Gas Prices</h2>
+    <ul class="max-w-4xl mx-auto px-4">
+      <li v-for="(gasPrice, index) in gasPrices" :key="index" class="border-b border-gray-300 py-4 flex items-center justify-between">
+        <span class="text-lg font-semibold">{{ gasPrice.StationName }}:</span>
+        <div class="flex items-center">
+          <span class="text-lg font-semibold">{{ gasPrice.FuelTypeName }}:</span>
+          <span class="mx-2">{{ getEmoji(gasPrice.FuelTypeName) }}</span>
+          <span class="text-lg font-semibold">${{ gasPrice.Price.toFixed(2) }}</span>
+        </div>
       </li>
     </ul>
   </div>
@@ -53,5 +55,5 @@ onMounted(() => {
 </script>
 
 <style scoped>
-
+/* You can add additional custom styles here */
 </style>
