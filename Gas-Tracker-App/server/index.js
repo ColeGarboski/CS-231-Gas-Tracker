@@ -22,11 +22,45 @@ app.get('/gas-prices', (req, res) => {
     SELECT 
       s.StationName,
       f.FuelTypeName,
-      p.Price
+      p.Price,
+      c.CompanyName
     FROM 
       Price p
       JOIN Station s ON p.StationID = s.StationID
       JOIN FuelType f ON p.FuelTypeID = f.FuelTypeID
+      JOIN Company c ON s.CompanyID = c.CompanyID
+  `;
+
+  pool.query(sql, (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send('Server error');
+    } else {
+      res.json(results);
+    }
+  });
+});
+
+// Get all companies
+app.get('/companies', (req, res) => {
+  const sql = `
+    SELECT CompanyName from Company
+  `;
+
+  pool.query(sql, (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send('Server error');
+    } else {
+      res.json(results);
+    }
+  });
+});
+
+// Get all fuel types
+app.get('/fuel-types', (req, res) => {
+  const sql = `
+    SELECT FuelTypeName from FuelType
   `;
 
   pool.query(sql, (error, results) => {
