@@ -18,7 +18,7 @@ const pool = mysql.createPool({
 
 // Get all gas prices from all stations
 app.get('/gas-prices', (req, res) => {
-  const sql = `
+  let sql = `
     SELECT 
       s.StationName,
       f.FuelTypeName,
@@ -31,7 +31,18 @@ app.get('/gas-prices', (req, res) => {
       JOIN Company c ON s.CompanyID = c.CompanyID
   `;
 
-  pool.query(sql, (error, results) => {
+  const queryParams = [];
+  if (req.query.companyName) {
+    sql += ' WHERE c.CompanyName = ?';
+    queryParams.push(req.query.companyName);
+  }
+
+  if (req.query.fuelTypeName) {
+    sql += req.query.companyName ? ' AND f.FuelTypeName = ?' : ' WHERE f.FuelTypeName = ?';
+    queryParams.push(req.query.fuelTypeName);
+  }
+
+  pool.query(sql, queryParams, (error, results) => {
     if (error) {
       console.error(error);
       res.status(500).send('Server error');

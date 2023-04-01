@@ -22,8 +22,9 @@
               class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
               <div class="py-1">
                 <MenuItem v-slot="{ active }" v-for="(company, index) in companies" :key="index">
-                <router-link @click="setCompany(company.CompanyName)" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']"
-                  :to="dynamicPricesRoute">{{ company.CompanyName }}</router-link>
+                  <a @click="setCompany(company.CompanyName)"
+                  :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">{{
+                    company.CompanyName }}</a>
                 </MenuItem>
               </div>
             </MenuItems>
@@ -48,8 +49,9 @@
               class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
               <div class="py-1">
                 <MenuItem v-slot="{ active }" v-for="(fuelType, index) in fuelTypes" :key="index">
-                  <router-link @click="setFuelType(fuelType.FuelTypeName)" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']"
-                  :to="dynamicPricesRoute">{{ fuelType.FuelTypeName }}</router-link>
+                <a @click="setFuelType(fuelType.FuelTypeName)"
+                  :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm']">{{
+                    fuelType.FuelTypeName }}</a>
                 </MenuItem>
               </div>
             </MenuItems>
@@ -75,22 +77,29 @@
 </template>
 
 <script setup>
-
-import { ref, computed, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
 
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { ChevronDownIcon } from '@heroicons/vue/20/solid';
 
-
-
 const gasPrices = ref([]);
 const companies = ref([]);
 const fuelTypes = ref([]);
 
-async function fetchGasPrices() {
+async function fetchGasPrices(companyName, fuelTypeName) {
+  const queryParams = new URLSearchParams();
+
+  if (companyName) {
+    queryParams.append('companyName', companyName);
+  }
+
+  if (fuelTypeName) {
+    queryParams.append('fuelTypeName', fuelTypeName);
+  }
+
   try {
-    const response = await axios.get('http://localhost:3000/gas-prices');
+    const response = await axios.get(`http://localhost:3000/gas-prices?${queryParams.toString()}`);
     gasPrices.value = response.data;
   } catch (error) {
     console.error(error);
@@ -135,27 +144,18 @@ function getEmoji(fuelType) {
   }
 }
 
-let selectedCompany = 'test company';
-let selectedFuelType = 'test fuel';
+const selectedCompany = ref('');
+const selectedFuelType = ref('');
 
 function setCompany(company) {
-  selectedCompany = company;
+  selectedCompany.value = company;
+  fetchGasPrices(selectedCompany.value, selectedFuelType.value);
 }
 
 function setFuelType(fuelType) {
-  selectedFuelType = fuelType;
+  selectedFuelType.value = fuelType;
+  fetchGasPrices(selectedCompany.value, selectedFuelType.value);
 }
-
-const dynamicPricesRoute = computed(() => {
-  console.log(selectedFuelType, selectedCompany)
-  return {
-        name: 'prices',
-        params: {
-          fuelType: selectedFuelType,
-          company: selectedCompany
-        }
-      }
-});
 
 onMounted(() => {
   fetchGasPrices();
@@ -164,6 +164,4 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
-/* You can add additional custom styles here */
-</style>
+<style scoped>/* You can add additional custom styles here */</style>
