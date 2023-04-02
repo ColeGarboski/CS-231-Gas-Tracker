@@ -71,7 +71,23 @@ app.get('/companies', (req, res) => {
 // Get all fuel types
 app.get('/fuel-types', (req, res) => {
   const sql = `
-    SELECT FuelTypeName from FuelType
+    SELECT FuelTypeID, FuelTypeName from FuelType
+  `;
+
+  pool.query(sql, (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send('Server error');
+    } else {
+      res.json(results);
+    }
+  });
+});
+
+// Get all stations
+app.get('/stations', (req, res) => {
+  const sql = `
+    SELECT StationName, StationID from Station
   `;
 
   pool.query(sql, (error, results) => {
@@ -131,6 +147,53 @@ app.get('/prices/:stationName', (req, res) => {
       res.status(500).send('Server error');
     } else {
       res.json(results);
+    }
+  });
+});
+
+// Add a company
+app.post('/add-company', (req, res) => {
+  const { companyName, companyDateCreated, companyValue, stationName } = req.body;
+  const sql = 'INSERT INTO Company (CompanyName, CompanyDateCreated, CompanyValue, StationName) VALUES (?, ?, ?, ?)';
+  pool.query(sql, [companyName, companyDateCreated, companyValue, stationName], (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send('Server error');
+    } else {
+      res.json({ message: 'Company added successfully', results });
+    }
+  });
+});
+
+// Add a station
+app.post('/add-station', (req, res) => {
+  const { stationName, stationAddress, companyID } = req.body;
+  const sql = 'INSERT INTO Station (StationName, StationAddress, CompanyID) VALUES (?, ?, ?)';
+  pool.query(sql, [stationName, stationAddress, companyID], (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send('Server error');
+    } else {
+      res.json({ message: 'Station added successfully', results });
+    }
+  });
+});
+
+// Add a fuel type to a station
+app.post('/add-fuel', (req, res) => {
+  const { stationId, fuelTypeId, price } = req.body;
+
+  const sql = `
+    INSERT INTO Price (StationID, FuelTypeID, Price)
+    VALUES (?, ?, ?)
+  `;
+
+  pool.query(sql, [stationId, fuelTypeId, price], (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send('Server error');
+    } else {
+      res.status(201).send('Fuel added to station');
     }
   });
 });
