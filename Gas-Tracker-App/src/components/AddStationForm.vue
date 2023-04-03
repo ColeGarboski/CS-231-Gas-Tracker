@@ -51,7 +51,7 @@ export default {
     setup() {
         const stationName = ref("");
         const stationAddress = ref("");
-        const selectedCompany = ref();
+        const selectedCompany = ref("");
 
         const submitForm = async () => {
             console.log(stationName.value, stationAddress.value, selectedCompany.value)
@@ -59,7 +59,7 @@ export default {
                 const response = await axios.post('http://localhost:3000/add-station', {
                     stationName: stationName.value,
                     stationAddress: stationAddress.value,
-                    selectedCompany: selectedCompany.value,
+                    companyID: selectedCompany.value,
                 });
 
                 console.log(response.data);
@@ -76,6 +76,10 @@ export default {
                 companies.value = response.data;
             } catch (error) {
                 console.error(error);
+            }
+
+            if (companies.value.length > 0) {
+                selectedCompany.value = companies.value[0].CompanyID; // Set the default value to the first company ID
             }
         };
 

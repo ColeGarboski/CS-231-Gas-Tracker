@@ -55,7 +55,7 @@ app.get('/gas-prices', (req, res) => {
 // Get all companies
 app.get('/companies', (req, res) => {
   const sql = `
-    SELECT CompanyName from Company
+    SELECT CompanyID, CompanyName from Company
   `;
 
   pool.query(sql, (error, results) => {

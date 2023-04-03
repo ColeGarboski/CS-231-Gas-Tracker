@@ -49,53 +49,62 @@ import axios from 'axios';
 import { ref, onMounted } from 'vue';
 
 export default {
-    data() {
-        return {
-            stationId: null,
-            fuelTypeId: null,
-            price: -1,
-            stations: [],
-            fuelTypes: [],
-        };
-    },
-    methods: {
-        async submitForm() {
-            console.log(this.stationId, this.fuelTypeId, this.price)
+    setup() {
+        const selectedStation = ref("");
+        const selectedFuelType = ref("");
+        const price = ref(null);
+        const stations = ref([]);
+        const fuelTypes = ref([]);
+
+        const submitForm = async () => {
+            console.log(selectedStation.value, selectedFuelType.value, price.value);
             try {
-                await axios.post('http://localhost:3000/add-fuel', {
-                    stationId: this.stationId,
-                    fuelTypeId: this.fuelTypeId,
-                    price: this.price,
+                await axios.post("http://localhost:3000/add-fuel", {
+                    stationId: selectedStation.value,
+                    fuelTypeId: selectedFuelType.value,
+                    price: price.value,
                 });
-                alert('Fuel added to station successfully');
-                this.stationId = '';
-                this.fuelTypeId = '';
-                this.price = '';
+                alert("Fuel added to station successfully");
+                selectedStation.value = "";
+                selectedFuelType.value = "";
+                price.value = "";
             } catch (error) {
                 console.error(error);
-                alert('Failed to add fuel to station');
+                alert("Failed to add fuel to station");
             }
-        },
-        async fetchStations() {
+        };
+
+        const fetchStations = async () => {
             try {
-                const response = await axios.get('http://localhost:3000/stations');
-                this.stations = response.data;
+                const response = await axios.get("http://localhost:3000/stations");
+                stations.value = response.data;
             } catch (error) {
                 console.error(error);
             }
-        },
-        async fetchFuelTypes() {
+        };
+
+        const fetchFuelTypes = async () => {
             try {
-                const response = await axios.get('http://localhost:3000/fuel-types');
-                this.fuelTypes = response.data;
+                const response = await axios.get("http://localhost:3000/fuel-types");
+                fuelTypes.value = response.data;
             } catch (error) {
                 console.error(error);
             }
-        },
-    },
-    mounted() {
-        this.fetchStations();
-        this.fetchFuelTypes();
+        };
+
+        onMounted(() => {
+            fetchStations();
+            fetchFuelTypes();
+        });
+
+        return {
+            selectedStation,
+            selectedFuelType,
+            price,
+            stations,
+            fuelTypes,
+            submitForm,
+        };
     },
 };
 </script>
