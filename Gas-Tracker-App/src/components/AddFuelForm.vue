@@ -46,19 +46,21 @@
   
 <script>
 import axios from 'axios';
+import { ref, onMounted } from 'vue';
 
 export default {
     data() {
         return {
-            stationId: '',
-            fuelTypeId: '',
-            price: '',
+            stationId: null,
+            fuelTypeId: null,
+            price: -1,
             stations: [],
             fuelTypes: [],
         };
     },
     methods: {
         async submitForm() {
+            console.log(this.stationId, this.fuelTypeId, this.price)
             try {
                 await axios.post('http://localhost:3000/add-fuel', {
                     stationId: this.stationId,

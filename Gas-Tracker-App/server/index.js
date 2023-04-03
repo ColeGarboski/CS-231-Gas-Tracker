@@ -153,9 +153,9 @@ app.get('/prices/:stationName', (req, res) => {
 
 // Add a company
 app.post('/add-company', (req, res) => {
-  const { companyName, companyDateCreated, companyValue, stationName } = req.body;
-  const sql = 'INSERT INTO Company (CompanyName, CompanyDateCreated, CompanyValue, StationName) VALUES (?, ?, ?, ?)';
-  pool.query(sql, [companyName, companyDateCreated, companyValue, stationName], (error, results) => {
+  const { companyName, companyDateCreated, companyValue } = req.body;
+  const sql = "INSERT INTO Company (CompanyName, CompanyDateCreated, CompanyValue) VALUES (?, DATE_FORMAT(?, '%Y-%m-%d'), ?)";
+  pool.query(sql, [companyName, companyDateCreated, companyValue], (error, results) => {
     if (error) {
       console.error(error);
       res.status(500).send('Server error');

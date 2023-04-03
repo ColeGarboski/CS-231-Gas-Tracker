@@ -11,6 +11,14 @@
                     placeholder="Enter the company's name" />
             </div>
             <div>
+                <label for="companyName" class="block text-neutral-200 text-sm font-bold mb-2">
+                    Company Name
+                </label>
+                <input v-model="companyDateCreated" id="companyDateCreated" type="date"
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    placeholder="Enter the company's founding date" />
+            </div>
+            <div>
                 <label for="companyValue" class="block text-neutral-200 text-sm font-bold mb-2">
                     Company Value
                 </label>
@@ -35,14 +43,15 @@ export default {
   data() {
     return {
       companyName: '',
-      companyDateCreated: '',
-      companyValue: '',
+      companyDateCreated: null,
+      companyValue: null,
     };
   },
   methods: {
     async submitForm() {
+      console.log(this.companyName, this.companyDateCreated, this.companyValue)
       try {
-        const response = await axios.post('/add-company', {
+        const response = await axios.post('http://localhost:3000/add-company', {
           companyName: this.companyName,
           companyDateCreated: this.companyDateCreated,
           companyValue: this.companyValue,

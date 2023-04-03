@@ -42,40 +42,58 @@
   
 <script>
 import axios from 'axios';
+import { ref, onMounted } from 'vue';
+
+const companies = ref([]);
 
 export default {
-    props: {
-        companies: {
-            type: Array,
-            default: () => [],
-        },
-    },
-    data() {
+    props: {},
+    setup() {
+        const stationName = ref("");
+        const stationAddress = ref("");
+        const selectedCompany = ref();
+
+        const submitForm = async () => {
+            console.log(stationName.value, stationAddress.value, selectedCompany.value)
+            try {
+                const response = await axios.post('http://localhost:3000/add-station', {
+                    stationName: stationName.value,
+                    stationAddress: stationAddress.value,
+                    selectedCompany: selectedCompany.value,
+                });
+
+                console.log(response.data);
+                alert('Station added successfully');
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error adding company');
+            }
+        };
+
+        const fetchCompanies = async () => {
+            try {
+                const response = await axios.get('http://localhost:3000/companies');
+                companies.value = response.data;
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        onMounted(fetchCompanies);
+
         return {
-            stationName: "",
-            stationAddress: "",
-            selectedCompany: "",
+            companies,
+            stationName,
+            stationAddress,
+            selectedCompany,
+            submitForm,
         };
     },
-    methods: {
-    async submitForm() {
-      try {
-        const response = await axios.post('/add-station', {
-            stationName: this.stationName,
-            stationAddress: this.stationAddress,
-            selectedCompany: this.selectedCompany,
-        });
-
-        console.log(response.data);
-        alert('Company added successfully');
-      } catch (error) {
-        console.error('Error:', error);
-        alert('Error adding company');
-      }
-    },
-  },
 };
 </script>
+
+
+
   
 <style scoped>
 /* Add custom styles if needed */
