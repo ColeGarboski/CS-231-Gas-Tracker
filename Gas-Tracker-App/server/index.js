@@ -20,6 +20,7 @@ const pool = mysql.createPool({
 app.get('/gas-prices', (req, res) => {
   let sql = `
     SELECT 
+      p.PriceID,
       s.StationName,
       f.FuelTypeName,
       p.Price,
@@ -194,6 +195,22 @@ app.post('/add-fuel', (req, res) => {
       res.status(500).send('Server error');
     } else {
       res.status(201).send('Fuel added to station');
+    }
+  });
+});
+
+// Delete a fuel from a station
+app.delete('/delete-fuel', (req, res) => {
+  const { PriceID } = req.body;
+
+  const sql = "DELETE from Price where PriceID = ?";
+
+  pool.query(sql, [PriceID], (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send('Server error');
+    } else {
+      res.status(201).send('Fuel deleted from station');
     }
   });
 });
