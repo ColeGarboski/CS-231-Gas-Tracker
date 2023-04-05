@@ -215,6 +215,44 @@ app.delete('/delete-fuel', (req, res) => {
   });
 });
 
+// Create a user account
+app.post('/signup', (req, res) => {
+  const { UserName, PasswordHash, Role } = req.body;
+
+  const sql = "INSERT INTO User (UserName, PasswordHash, Role) VALUES (?, ?, ?);";
+
+  pool.query(sql, [UserName, PasswordHash, Role], (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send('Server error');
+    } else {
+      res.status(201).send('Account Created Successfully');
+    }
+  });
+});
+
+// Login
+app.get('/login', (req, res) => {
+  const { UserName, PasswordHash } = req.body;
+
+  const sql = "SELECT * FROM User WHERE UserName = ? AND PasswordHash = ?";
+
+  pool.query(sql, [UserName, PasswordHash], (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send('Server error');
+    } else {
+      if (results.length > 0) {
+        // Login successful
+        res.status(200).send('Login successful');
+      } else {
+        // Invalid username or password
+        res.status(401).send('Invalid username or password');
+      }
+    }
+  });
+});
+
 const PORT = 3000;
 
 app.listen(PORT, () => {
