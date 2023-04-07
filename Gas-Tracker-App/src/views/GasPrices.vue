@@ -1,8 +1,26 @@
 <template>
   <div class="bg-slate-800 min-h-screen">
-    <h2 class="text-4xl text-neutral-200 font-bold text-center py-8">Gas Prices</h2>
     <div class="max-w-4xl mx-auto px-4 flex items-center justify-between">
+      <span></span>
+      <h2 class="text-4xl text-neutral-200 font-bold text-center py-8">Gas Prices</h2>
       <Menu as="div" class="relative inline-block text-left">
+        <div>
+          <template v-if="loggedIn">
+            <span class="text-sm font-semibold text-neutral-200">
+              {{ userName }}
+            </span>
+          </template>
+          <template v-else>
+            <MenuButton @click="switchToLoginScreen()"
+              class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+              Login
+            </MenuButton>
+          </template>
+        </div>
+      </Menu>
+    </div>
+    <div class="max-w-4xl mx-auto px-4 flex items-center justify-between">
+      <Menu v-if="managerLoggedIn" as="div" class="relative inline-block text-left">
         <div>
           <MenuButton @click="switchToAddScreen()"
             class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
@@ -11,7 +29,7 @@
           </MenuButton>
         </div>
       </Menu>
-      <Menu as="div" class="relative inline-block text-left">
+      <Menu v-if="managerLoggedIn" as="div" class="relative inline-block text-left">
         <div>
           <MenuButton @click="switchToDeleteScreen()"
             class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
@@ -100,19 +118,26 @@
 </template>
   
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
+import { useStore } from 'vuex';
 
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { ChevronDownIcon, TrashIcon, PlusIcon } from '@heroicons/vue/20/solid';
 
+
 const router = useRouter();
+const store = useStore();
 
 const gasPrices = ref([]);
 const companies = ref([]);
 const fuelTypes = ref([]);
+
 const showDeleteButtons = ref(false);
+const managerLoggedIn = computed(() => store.state.managerLoggedIn);
+const loggedIn = computed(() => store.state.loggedIn);
+const userName = computed(() => store.state.userName);
 
 async function fetchGasPrices(companyName, fuelTypeName) {
   const queryParams = new URLSearchParams();
@@ -207,6 +232,10 @@ function switchToAddScreen() {
 
 function switchToDeleteScreen() {
   showDeleteButtons.value = !showDeleteButtons.value;
+}
+
+function switchToLoginScreen() {
+  router.push({ name: "vueSignup" });
 }
 
 onMounted(() => {

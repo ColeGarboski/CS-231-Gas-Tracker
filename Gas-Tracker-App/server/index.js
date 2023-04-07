@@ -152,6 +152,22 @@ app.get('/prices/:stationName', (req, res) => {
   });
 });
 
+// Get all roles
+app.get('/roles', (req, res) => {
+  const sql = `
+    SELECT RoleID, RoleName from Role
+  `;
+
+  pool.query(sql, (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send('Server error');
+    } else {
+      res.json(results);
+    }
+  });
+});
+
 // Add a company
 app.post('/add-company', (req, res) => {
   const { companyName, companyDateCreated, companyValue } = req.body;
@@ -219,35 +235,43 @@ app.delete('/delete-fuel', (req, res) => {
 app.post('/signup', (req, res) => {
   const { UserName, PasswordHash, Role } = req.body;
 
-  const sql = "INSERT INTO User (UserName, PasswordHash, Role) VALUES (?, ?, ?);";
+  const selectSql = "SELECT UserName FROM User WHERE UserName = ?;";
+  const insertSql = "INSERT INTO User (UserName, PasswordHash, Role) VALUES (?, ?, ?);";
 
-  pool.query(sql, [UserName, PasswordHash, Role], (error, results) => {
+  pool.query(selectSql, [UserName], (error, results) => {
     if (error) {
       console.error(error);
       res.status(500).send('Server error');
+    } else if (results.length > 0) {
+      res.status(400).send('Username already exists');
     } else {
-      res.status(201).send('Account Created Successfully');
+      pool.query(insertSql, [UserName, PasswordHash, Role], (error, results) => {
+        if (error) {
+          console.error(error);
+          res.status(500).send('Server error');
+        } else {
+          res.status(201).send('Account Created Successfully');
+        }
+      });
     }
   });
 });
 
 // Login
-app.get('/login', (req, res) => {
-  const { UserName, PasswordHash } = req.body;
+app.post('/login', (req, res) => {
+  const { UserName } = req.body;
 
-  const sql = "SELECT * FROM User WHERE UserName = ? AND PasswordHash = ?";
-
-  pool.query(sql, [UserName, PasswordHash], (error, results) => {
+  const sql = "SELECT * FROM User WHERE UserName = ?";
+  pool.query(sql, [UserName], (error, results) => {
     if (error) {
       console.error(error);
       res.status(500).send('Server error');
     } else {
       if (results.length > 0) {
-        // Login successful
-        res.status(200).send('Login successful');
+        res.json(results);
       } else {
-        // Invalid username or password
-        res.status(401).send('Invalid username or password');
+        // Invalid username
+        res.status(401).send('Invalid username');
       }
     }
   });
