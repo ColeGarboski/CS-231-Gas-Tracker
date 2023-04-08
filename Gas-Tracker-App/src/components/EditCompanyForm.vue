@@ -1,7 +1,19 @@
 <template>
     <form @submit.prevent="submitForm" class="bg-gray-700 rounded-lg p-6 my-8">
-        <h3 class="text-2xl text-neutral-200 font-bold mb-4">Add Company</h3>
+        <h3 class="text-2xl text-neutral-200 font-bold mb-4">Edit Company</h3>
         <div class="space-y-4">
+            <div class="mb-4">
+                <label for="company" class="block text-neutral-200 text-sm font-bold mb-2">
+                    Company
+                </label>
+                <select id="company" v-model="selectedCompany"
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    <option value="" disabled>Select a company</option>
+                    <option v-for="(company, index) in companies" :key="index" :value="company.CompanyID">
+                        {{ company.CompanyName }}
+                    </option>
+                </select>
+            </div>
             <div>
                 <label for="companyName" class="block text-neutral-200 text-sm font-bold mb-2">
                     Company Name
@@ -29,45 +41,54 @@
             <div>
                 <button type="submit"
                     class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                    Add Company
+                    Edit Company
                 </button>
             </div>
         </div>
     </form>
 </template>
   
-<script>
+<script setup>
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
 
-export default {
-  data() {
-    return {
-      companyName: '',
-      companyDateCreated: null,
-      companyValue: null,
-    };
-  },
-  methods: {
-    async submitForm() {
-      console.log(this.companyName, this.companyDateCreated, this.companyValue)
-      try {
-        const response = await axios.post('http://localhost:3000/add-company', {
-          companyName: this.companyName,
-          companyDateCreated: this.companyDateCreated,
-          companyValue: this.companyValue,
-        });
+const companyName = ref('');
+const companyDateCreated = ref(null);
+const companyValue = ref(null);
+const companies = ref([]);
+const selectedCompany = ref(null);
 
-        console.log(response.data);
-        alert('Company added successfully');
-      } catch (error) {
-        console.error('Error:', error);
-        alert('Error adding company');
-      }
-    },
-  },
-};
+async function submitForm() {
+  console.log(companyName.value, companyDateCreated.value, companyValue.value);
+  try {
+    const response = await axios.put(`http://localhost:3000/edit-company/`, {
+      companyName: companyName.value,
+      companyDateCreated: companyDateCreated.value,
+      companyValue: companyValue.value,
+      companyID: selectedCompany.value,
+    });
+
+    console.log(response.data);
+    alert('Company edited successfully');
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Error editing company');
+  }
+}
+
+async function fetchCompanies() {
+  try {
+    const response = await axios.get('http://localhost:3000/companies');
+    companies.value = response.data;
+    console.log(companies.value);
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+onMounted(fetchCompanies);
 </script>
-  
+
 <style scoped>
 /* Add custom styles if needed */
 </style>

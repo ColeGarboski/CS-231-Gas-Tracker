@@ -38,7 +38,16 @@
           </MenuButton>
         </div>
       </Menu>
-      <span></span><span></span><span></span>
+      <Menu v-if="managerLoggedIn" as="div" class="relative inline-block text-left">
+        <div>
+          <MenuButton @click="switchToEditScreen()"
+            class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+            Edit
+            <PencilIcon class="-mr-1 h-5 w-5 text-gray-400" aria-hidden="true" />
+          </MenuButton>
+        </div>
+      </Menu>
+      <span></span><span></span>
       <span class="text-2xl text-neutral-200">Filter By: </span>
       <span>
         <Menu as="div" class="relative inline-block text-left">
@@ -124,7 +133,7 @@ import axios from 'axios';
 import { useStore } from 'vuex';
 
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
-import { ChevronDownIcon, TrashIcon, PlusIcon } from '@heroicons/vue/20/solid';
+import { ChevronDownIcon, TrashIcon, PlusIcon, PencilIcon } from '@heroicons/vue/20/solid';
 
 
 const router = useRouter();
@@ -236,6 +245,10 @@ function switchToDeleteScreen() {
 
 function switchToLoginScreen() {
   router.push({ name: "vueSignup" });
+}
+
+function switchToEditScreen() {
+  router.push({ name: "vueEdit" });
 }
 
 onMounted(() => {
