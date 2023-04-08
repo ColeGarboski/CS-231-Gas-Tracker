@@ -4,6 +4,7 @@ import Add from '../views/Add.vue'
 import Delete from '../views/Delete.vue'
 import Update from '../views/Update.vue'
 import Signup from '../views/Signup.vue'
+import Edit from '../views/Edit.vue'
 
 
 const router = createRouter({
@@ -33,6 +34,11 @@ const router = createRouter({
       path: '/signup',
       name: 'vueSignup',
       component: Signup
+    },
+    {
+      path: '/edit',
+      name: 'vueEdit',
+      component: Edit
     },
   ]
 })

@@ -56,7 +56,7 @@ app.get('/gas-prices', (req, res) => {
 // Get all companies
 app.get('/companies', (req, res) => {
   const sql = `
-    SELECT CompanyID, CompanyName from Company
+    SELECT * from Company
   `;
 
   pool.query(sql, (error, results) => {
@@ -88,7 +88,7 @@ app.get('/fuel-types', (req, res) => {
 // Get all stations
 app.get('/stations', (req, res) => {
   const sql = `
-    SELECT StationName, StationID from Station
+    SELECT * from Station
   `;
 
   pool.query(sql, (error, results) => {
@@ -182,6 +182,20 @@ app.post('/add-company', (req, res) => {
   });
 });
 
+// Edit a company
+app.put('/edit-company/', (req, res) => {
+  const { companyName, companyDateCreated, companyValue, companyID } = req.body;
+  const sql = "UPDATE Company SET CompanyName = ?, CompanyDateCreated = DATE_FORMAT(?, '%Y-%m-%d'), CompanyValue = ? WHERE CompanyID = ?";
+  pool.query(sql, [companyName, companyDateCreated, companyValue, companyID], (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send('Server error');
+    } else {
+      res.json({ message: 'Company updated successfully', results });
+    }
+  });
+});
+
 // Add a station
 app.post('/add-station', (req, res) => {
   const { stationName, stationAddress, companyID } = req.body;
@@ -192,6 +206,20 @@ app.post('/add-station', (req, res) => {
       res.status(500).send('Server error');
     } else {
       res.json({ message: 'Station added successfully', results });
+    }
+  });
+});
+
+// Edit a station
+app.put('/edit-station', (req, res) => {
+  const { stationName, stationAddress, companyID, stationID } = req.body;
+  const sql = 'UPDATE Station SET StationName = ?, StationAddress = ?, CompanyID = ? WHERE StationID = ?';
+  pool.query(sql, [stationName, stationAddress, companyID, stationID], (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send('Server error');
+    } else {
+      res.json({ message: 'Station updated successfully', results });
     }
   });
 });
@@ -211,6 +239,22 @@ app.post('/add-fuel', (req, res) => {
       res.status(500).send('Server error');
     } else {
       res.status(201).send('Fuel added to station');
+    }
+  });
+});
+
+// Edit a fuel type at a station
+app.put('/edit-fuel', (req, res) => {
+  const { StationID, FuelTypeID, Price, PriceID } = req.body;
+
+  const sql = 'UPDATE Price SET StationID = ?, FuelTypeID = ?, Price = ? WHERE PriceID = ?;';
+
+  pool.query(sql, [StationID, FuelTypeID, Price, PriceID], (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send('Server error');
+    } else {
+      res.status(200).send('Fuel edited');
     }
   });
 });
